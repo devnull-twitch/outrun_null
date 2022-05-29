@@ -100,7 +100,7 @@ function generator.new()
     
     gen.extras = {}
     gen.extraPhysics = {}
-    gen.lastExtra = 40
+    gen.lastExtra = 10
 
     return gen
 end
@@ -121,7 +121,6 @@ function generator.genColumn(gen)
             i = i + 1
         end
         gen.column = gen.column + 1
-        print("gen col length", gen.column)
     end
 
     -- void zone update

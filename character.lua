@@ -14,7 +14,8 @@ function Character:new(x, y)
     o.body = love.physics.newBody(world, x, y, "dynamic") 
     o.shape = love.physics.newCircleShape(characterCollisionSize)
     o.fixture = love.physics.newFixture(o.body, o.shape)
-    o.savePos = { x = x, y = y }
+    o.fixture:setUserData("player")
+    o.blockings = { up = false, down = false, left = false, right = false  }
     setmetatable(o, self)
     self.__index = self
 
@@ -91,45 +92,53 @@ function Character:autoScroll(dx)
     self.drawOffset = self.drawOffset + dx
 end
 
+function Character:blockMovement(dir)
+    self.blockings[dir] = true
+end
+
+function Character:unblock()
+    self.blockings = { up = false, down = false, left = false, right = false  }
+end
+
 function Character:move(dx, dy)
-    local contacts = self.body:getContacts()
-    local processedOne = false
-    local contactIndex = 1
-    while not processedOne and contacts[contactIndex] do
-        local contact = contacts[contactIndex]
-        if contact:isTouching() then
-            local x1, y1, x2, y2 = contact:getPositions()
-            print("collision", x1, y1, x2, y2)
-            local cvx = self.body:getX() - x1
-            local cvy = self.body:getY() - y1
-            self.body:setPosition(self.body:getX() + cvx, self.body:getY() + cvy)
-            processedOne = true
-            return
-        end
-
-        contactIndex = contactIndex + 1
-    end
-
     if not (dx == 0) then
         if dx > 0 then
-            self.state = "moveRight"
+            if self.blockings.right then
+                dx = 0
+            else
+                self.state = "moveRight"
+            end
         else
-            self.state = "moveLeft"
+            if self.blockings.left then
+                dx = 0
+            else
+                self.state = "moveLeft"
+            end
         end
     end
 
     if not (dy == 0) then
         if dy > 0 then
-            self.state = "moveDown"
+            if self.blockings.down then
+                dy = 0
+            else
+                self.state = "moveDown"
+            end
         else
-            self.state = "moveUp"
+            if self.blockings.up then
+                dy = 0
+            else
+                self.state = "moveUp"
+            end
         end
     end
 
     if not (dx == 0) or not (dy == 0) then
-        self.body:setPosition(self.body:getX() + dx, self.body:getY() + dy)
+        self.body:setLinearVelocity(dx * 100, dy * 100)
         return
     end
+
+    self.body:setLinearVelocity(0, 0)
 
     if string.sub(self.state, 0, 4) == "move" then
         self.state = string.gsub(self.state, "move", "idle")
@@ -150,4 +159,8 @@ function Character:genGenPosition()
     local genY = math.floor((self.body:getY() + (sprite_size * 0.5))/ sprite_size)
 
     return genX, genY
+end
+
+function Character:isPlayer(fixture)
+    return fixture:getUserData() == "player"
 end

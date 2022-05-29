@@ -5,12 +5,13 @@ require "character"
 character_speed = 70
 auto_scroll = 0.2
 paused = false
-debug = true
+debug = false
 
 function love.load()
     love.window.setMode(650, 650)
 
     world = love.physics.newWorld(0, 0, true)
+    world:setCallbacks(beginContact, endContact, preSolve, postSolve)
 
     gen = generator.new()
     generator.genColumn(gen)
@@ -78,4 +79,48 @@ function love.keypressed(key, scancode, isrepeat)
     if key == "p" and not isrepeat then
         paused = not paused
     end
+
+    if key == "m" and not isrepeat then
+        auto_scroll = 0
+    end
+end
+
+function beginContact(a, b, coll)
+    if not coll:isTouching() then
+        return
+    end
+
+    local x1, y1, x2, y2 = coll:getPositions()
+    local px, py = player.body:getPosition()
+    local xDiff = math.abs(px - x1)
+    local yDiff = math.abs(py - y1)
+
+    if xDiff > yDiff then
+        if px > x1 then
+            player.blockings.left = true
+        else
+            player.blockings.right = true
+        end
+    end
+
+    if yDiff > xDiff then
+        if py > y1  then
+            player.blockings.up = true
+        else
+            player.blockings.down = true
+        end
+    end
+end
+
+function endContact(a, b, coll)
+    print("end contact")
+	player:unblock()
+end
+
+function preSolve(a, b, coll)
+	
+end
+
+function postSolve(a, b, coll, normalimpulse, tangentimpulse)
+	
 end
