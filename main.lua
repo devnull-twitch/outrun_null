@@ -1,14 +1,19 @@
 require "game"
 require "generator"
 require "character"
+require "menu"
 
 character_speed = 70
 auto_scroll = 0.2
 paused = false
+started = false
 debug = false
 
 function love.load()
     love.window.setMode(650, 650)
+
+    love.graphics.setFont(defaultFont)
+    menu.load()
 
     world = love.physics.newWorld(0, 0, true)
     world:setCallbacks(beginContact, endContact, preSolve, postSolve)
@@ -21,6 +26,11 @@ function love.load()
 end
 
 function love.draw()
+    if not started then
+        menu.draw()
+        return
+    end
+
     -- clear screen
     love.graphics.clear(0.10, 0.15, 0.2)
 
@@ -44,6 +54,11 @@ function love.draw()
 end
 
 function love.update(dt)
+    if not started then
+        menu.update(dt)
+        return
+    end
+
     if player.dead then
         return
     end
@@ -76,6 +91,11 @@ function love.update(dt)
 end
 
 function love.keypressed(key, scancode, isrepeat)
+    if not started then
+        menu.keypressed(key, scancode, isrepeat)
+        return
+    end
+
     if key == "p" and not isrepeat then
         paused = not paused
     end
