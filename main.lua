@@ -1,13 +1,15 @@
-require "game"
 require "generator"
 require "character"
 require "menu"
+require "autoscroll"
+require "powerup"
 
 character_speed = 70
-auto_scroll = 0.2
 paused = false
 started = false
 debug = false
+
+coins = 0
 
 function love.load()
     love.window.setMode(650, 650)
@@ -21,7 +23,7 @@ function love.load()
     gen = generator.new()
     generator.genColumn(gen)
 
-    player = Character:new(200, 100)
+    player = Character:new(300, 650/2)
     player:init()
 end
 
@@ -34,9 +36,16 @@ function love.draw()
     -- clear screen
     love.graphics.clear(0.10, 0.15, 0.2)
 
+    -- draw ground
     love.graphics.setColor(1.0, 1.0, 1.0)
     local quadsDrawn = generator.draw(gen)
 
+    powerups.draw()
+
+    -- draw time and stuff
+    autoscroll.draw()
+
+    -- draw player character
     love.graphics.setColor(1.0, 1.0, 1.0)
     player:draw()
 
@@ -67,9 +76,10 @@ function love.update(dt)
         return
     end
 
+    autoscroll.update(dt)
     world:update(dt)
 
-    generator.move(gen, auto_scroll)
+    generator.move(gen, autoscroll.speed)
     generator.genColumn(gen)
 
     local mx = 0
@@ -84,9 +94,13 @@ function love.update(dt)
     elseif love.keyboard.isDown("d") then
         mx = character_speed
     end
+
+    powerups.autoScroll(autoscroll.speed)
+    powerups.update(dt)
     
-    player:autoScroll(auto_scroll)
+    player:autoScroll(autoscroll.speed)
     player:move(mx * dt, my * dt)
+    player:update(dt)
     player:checkDeath(gen)
 end
 
@@ -100,41 +114,22 @@ function love.keypressed(key, scancode, isrepeat)
         paused = not paused
     end
 
-    if key == "m" and not isrepeat then
-        auto_scroll = 0
+    if started and (key == "space") and not isrepeat then
+        player:jump()
     end
 end
 
 function beginContact(a, b, coll)
-    if not coll:isTouching() then
-        return
+    if a:getUserData() == "powerup" then
+        powerups.collision(a)
     end
-
-    local x1, y1, x2, y2 = coll:getPositions()
-    local px, py = player.body:getPosition()
-    local xDiff = math.abs(px - x1)
-    local yDiff = math.abs(py - y1)
-
-    if xDiff > yDiff then
-        if px > x1 then
-            player.blockings.left = true
-        else
-            player.blockings.right = true
-        end
-    end
-
-    if yDiff > xDiff then
-        if py > y1  then
-            player.blockings.up = true
-        else
-            player.blockings.down = true
-        end
+    if b:getUserData() == "powerup" then
+        powerups.collision(b)
     end
 end
 
 function endContact(a, b, coll)
-    print("end contact")
-	player:unblock()
+    
 end
 
 function preSolve(a, b, coll)

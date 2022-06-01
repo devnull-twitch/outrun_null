@@ -1,6 +1,7 @@
 sprite_size = 16
 void_start = 10
 extra_spacing = 10
+powerup_spacing = 10
 
 function gridQuad(cellX, cellY, sw, sh)
     return love.graphics.newQuad(cellX * sprite_size, cellY * sprite_size, sprite_size, sprite_size, sw, sh)
@@ -100,7 +101,9 @@ function generator.new()
     
     gen.extras = {}
     gen.extraPhysics = {}
-    gen.lastExtra = 10
+    gen.lastExtra = 15
+
+    gen.lastPowerup = 20
 
     return gen
 end
@@ -110,6 +113,12 @@ function generator.genColumn(gen)
         if (gen.column > gen.lastExtra + extra_spacing) and (love.math.random() > 0.92) then
             generator.makeCliff(gen, gen.column, 3)
         end
+
+        if (gen.column > gen.lastPowerup + powerup_spacing) and (love.math.random() > 0) then
+            local powerupY = math.floor(love.math.random(3, gen.height / sprite_size - 3))
+            powerups.spawn(gen.column * sprite_size, powerupY * sprite_size)
+            gen.lastPowerup = gen.column
+        end 
 
         gen.cols[gen.column] = {}
         gen.skips[gen.column] = {}
