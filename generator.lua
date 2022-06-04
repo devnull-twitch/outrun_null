@@ -105,6 +105,21 @@ function generator.new()
 
     gen.lastPowerup = 20
 
+    gen.borderRight = {}
+    gen.borderRight.body = love.physics.newBody(world, width - 10, height/2, "kinematic")
+    gen.borderRight.shape = love.physics.newEdgeShape(0, -height/2, 0, height/2)
+    gen.borderRight.fixture = love.physics.newFixture(gen.borderRight.body, gen.borderRight.shape)
+
+    gen.borderTop = {}
+    gen.borderTop.body = love.physics.newBody(world, width/2, 10, "kinematic")
+    gen.borderTop.shape = love.physics.newEdgeShape(-width/2, 0, width/2, 0)
+    gen.borderTop.fixture = love.physics.newFixture(gen.borderTop.body, gen.borderTop.shape)
+
+    gen.borderBottom = {}
+    gen.borderBottom.body = love.physics.newBody(world, width/2, height-10, "kinematic")
+    gen.borderBottom.shape = love.physics.newEdgeShape(-width/2, 0, width/2, 0)
+    gen.borderBottom.fixture = love.physics.newFixture(gen.borderBottom.body, gen.borderBottom.shape)
+
     return gen
 end
 
@@ -259,4 +274,8 @@ function generator.move(gen, translateX)
     if gen.offset < 0 then
         gen.offset = 0
     end
+
+    gen.borderRight.body:setX(gen.borderRight.body:getX() + translateX)
+    gen.borderTop.body:setX(gen.borderTop.body:getX() + translateX)
+    gen.borderBottom.body:setX(gen.borderBottom.body:getX() + translateX)
 end

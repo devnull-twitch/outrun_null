@@ -93,7 +93,7 @@ function powerups.draw()
     )
     love.graphics.setColor(0.9, 0.9, 1)
 
-    love.graphics.print(string.format("Coins: %d", coins), gen.width - 95, 5)    
+    love.graphics.print(string.format("Coins: %d", coins), gen.width - 95, 5)
 end
 
 function powerups.collision(powerupFixture)

@@ -62,6 +62,7 @@ function love.draw()
     end
 end
 
+playerPhase = 0
 function love.update(dt)
     if not started then
         menu.update(dt)
@@ -102,6 +103,11 @@ function love.update(dt)
     player:move(mx * dt, my * dt)
     player:update(dt)
     player:checkDeath(gen)
+
+    if (autoscroll.phase % 30 == 0) and (math.floor(autoscroll.phase / 30) == playerPhase) then
+        playerPhase = playerPhase + 1
+        playerSpeed = playerSpeed + 80
+    end
 end
 
 function love.keypressed(key, scancode, isrepeat)

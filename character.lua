@@ -23,7 +23,6 @@ function Character:new(x, y)
     o.shape = love.physics.newCircleShape(characterCollisionSize)
     o.fixture = love.physics.newFixture(o.body, o.shape)
     o.fixture:setUserData("player")
-    o.blockings = { up = false, down = false, left = false, right = false  }
     setmetatable(o, self)
     self.__index = self
 
@@ -120,6 +119,17 @@ function Character:draw()
     end
 
     love.graphics.pop()
+
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.rectangle(
+        "fill",
+        gen.width - 100, 35,
+        100, 35
+    )
+    love.graphics.setColor(1, 1, 1)
+    for ji = 1, player.availableJumps do
+        love.graphics.draw(powerupSprite, powers[3].quad, gen.width - 95 + ((ji - 1) * 20), 40)
+    end
 end
 
 function Character:autoScroll(dx)
@@ -130,14 +140,6 @@ function Character:update(dt)
     if self.isJumping then
         self.jumpTime = self.jumpTime + dt
     end
-end
-
-function Character:blockMovement(dir)
-    self.blockings[dir] = true
-end
-
-function Character:unblock()
-    self.blockings = { up = false, down = false, left = false, right = false  }
 end
 
 jumpHeight = 3 * sprite_size
@@ -167,38 +169,6 @@ function Character:move(dx, dy)
     if self.isJumping then
         self.body:setLinearVelocity(0, 0)
         return
-    end
-
-    if not (dx == 0) then
-        if dx > 0 then
-            if self.blockings.right then
-                dx = 0
-            else
-                self.state = "moveRight"
-            end
-        else
-            if self.blockings.left then
-                dx = 0
-            else
-                self.state = "moveLeft"
-            end
-        end
-    end
-
-    if not (dy == 0) then
-        if dy > 0 then
-            if self.blockings.down then
-                dy = 0
-            else
-                self.state = "moveDown"
-            end
-        else
-            if self.blockings.up then
-                dy = 0
-            else
-                self.state = "moveUp"
-            end
-        end
     end
 
     if not (dx == 0) or not (dy == 0) then
