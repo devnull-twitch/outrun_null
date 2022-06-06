@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Outrun DevNull
+Comment=An  endless runner game made for the chill vibes game jam
+MimeType=application/x-love-game;
+Exec=OutrunDevNull %f
+Type=Application
+Categories=Game;
+Terminal=false
+Icon=love
+NoDisplay=true

@@ -1,0 +1,39 @@
+name: "godot-ci export"
+
+on: 
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Create all executables
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create .love bundle
+        run: |
+          zip -r OutrunDevNull.love assets *.lua
+      - name: Download and build windows
+        run: |
+          wget https://github.com/love2d/love/releases/download/11.4/love-11.4-win64.zip
+          unzip love-11.4-win64.zip
+          cat love-11.4-win64/love.exe OutrunDevNull.love > OutrunDevNull.exe
+      - name: Downlopad and build appimage
+        run: |
+          wget https://github.com/love2d/love/releases/download/11.4/love-11.4-x86_64.AppImage
+          chmod +x love-11.4-x86_64.AppImage
+          love-11.4-x86_64.AppImage --appimage-extract
+          cat squashfs-root/bin/love OutrunDevNull.love > squashfs-root/bin/OutrunDevNull
+          chmod +x squashfs-root/bin/OutrunDevNull
+          rm squashfs-root/love.desktop
+          mv build/love.desktop squashfs-root/love.desktop
+          wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+          appimagetool-x86_64.AppImage squashfs-root OutrunDevNull.AppImage
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "OutrunDevNull.exe,OutrunDevNull.AppImage"
+          omitBody: true
+          token: ${{ secrets.GHCR_TOKEN }}
