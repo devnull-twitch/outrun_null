@@ -35,7 +35,7 @@ function powerups.spawn(x, y)
     newPowerup.shape = love.physics.newRectangleShape(sprite_size, sprite_size)
     newPowerup.fixture = love.physics.newFixture(newPowerup.body, newPowerup.shape)
     newPowerup.fixture:setUserData("powerup")
-    powersSpawned[table.maxn(powersSpawned) + 1] = newPowerup
+    table.insert(powersSpawned, newPowerup)
 end
 
 function powerups.autoScroll(dx)

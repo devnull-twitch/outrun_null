@@ -157,6 +157,7 @@ function generator.reset(gen)
     gen.borderTop.body:setX(gen.width/2)
     gen.borderBottom.body:setX(gen.width/2)
 
+    -- reset powerups 
     local powerupIndex = 1
     while powersSpawned[powerupIndex] do
         local expower = powersSpawned[powerupIndex]
@@ -166,6 +167,7 @@ function generator.reset(gen)
         powerupIndex = powerupIndex + 1
     end
     powersSpawned = {}
+    powerups.drawOffset = 0
 end
 
 function generator.genColumn(gen)
