@@ -37,4 +37,5 @@ jobs:
         with:
           artifacts: "OutrunDevNull.exe,OutrunDevNull.AppImage"
           omitBody: true
+          tag: "v1.0.0"
           token: ${{ secrets.GHCR_TOKEN }}
