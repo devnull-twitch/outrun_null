@@ -24,7 +24,7 @@ jobs:
         run: |
           wget https://github.com/love2d/love/releases/download/11.4/love-11.4-x86_64.AppImage
           chmod +x love-11.4-x86_64.AppImage
-          love-11.4-x86_64.AppImage --appimage-extract
+          ./love-11.4-x86_64.AppImage --appimage-extract
           cat squashfs-root/bin/love OutrunDevNull.love > squashfs-root/bin/OutrunDevNull
           chmod +x squashfs-root/bin/OutrunDevNull
           rm squashfs-root/love.desktop
