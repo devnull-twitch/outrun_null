@@ -30,6 +30,7 @@ jobs:
           rm squashfs-root/love.desktop
           mv build/love.desktop squashfs-root/love.desktop
           wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
           ./appimagetool-x86_64.AppImage squashfs-root OutrunDevNull.AppImage
       - name: Create release
         uses: ncipollo/release-action@v1
