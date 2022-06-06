@@ -20,6 +20,9 @@ jobs:
           wget https://github.com/love2d/love/releases/download/11.4/love-11.4-win64.zip
           unzip love-11.4-win64.zip
           cat love-11.4-win64/love.exe OutrunDevNull.love > OutrunDevNull.exe
+          cp love-11.4-win64/*.dll .
+          cp love-11.4-win64/license.txt license.txt
+          zip windows-version.zip *.dll OutrunDevNull.exe license.txt
       - name: Downlopad and build appimage
         run: |
           wget https://github.com/love2d/love/releases/download/11.4/love-11.4-x86_64.AppImage
@@ -35,7 +38,7 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "OutrunDevNull.exe,OutrunDevNull.AppImage"
+          artifacts: "windows-version.zip,OutrunDevNull.AppImage"
           omitBody: true
-          tag: "v1.0.0"
+          tag: "v1.0.1"
           token: ${{ secrets.GHCR_TOKEN }}
