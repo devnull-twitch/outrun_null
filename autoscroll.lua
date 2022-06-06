@@ -17,6 +17,13 @@ function autoscroll.update(dt)
     end
 end
 
+function autoscroll.reset()
+    autoscroll.time = 0
+    autoscroll.totaltime = 0
+    autoscroll.speed = 0.2
+    autoscroll.phase = 1
+end
+
 function autoscroll.draw()
     love.graphics.setColor(0, 0, 0)
     love.graphics.rectangle(

@@ -3,8 +3,12 @@ void_start = 10
 extra_spacing = 10
 powerup_spacing = 10
 
-function gridQuad(cellX, cellY, sw, sh)
-    return love.graphics.newQuad(cellX * sprite_size, cellY * sprite_size, sprite_size, sprite_size, sw, sh)
+function gridQuad(cellX, cellY, sw, sh, gridSize)
+    if not gridSize then
+        gridSize = sprite_size
+    end
+
+    return love.graphics.newQuad(cellX * gridSize, cellY * gridSize, gridSize, gridSize, sw, sh)
 end
 
 generator = {}
@@ -109,18 +113,59 @@ function generator.new()
     gen.borderRight.body = love.physics.newBody(world, width - 10, height/2, "kinematic")
     gen.borderRight.shape = love.physics.newEdgeShape(0, -height/2, 0, height/2)
     gen.borderRight.fixture = love.physics.newFixture(gen.borderRight.body, gen.borderRight.shape)
+    gen.borderRight.fixture:setUserData("borderRight")
 
     gen.borderTop = {}
     gen.borderTop.body = love.physics.newBody(world, width/2, 10, "kinematic")
     gen.borderTop.shape = love.physics.newEdgeShape(-width/2, 0, width/2, 0)
     gen.borderTop.fixture = love.physics.newFixture(gen.borderTop.body, gen.borderTop.shape)
+    gen.borderTop.fixture:setUserData("borderTop")
 
     gen.borderBottom = {}
     gen.borderBottom.body = love.physics.newBody(world, width/2, height-10, "kinematic")
     gen.borderBottom.shape = love.physics.newEdgeShape(-width/2, 0, width/2, 0)
     gen.borderBottom.fixture = love.physics.newFixture(gen.borderBottom.body, gen.borderBottom.shape)
+    gen.borderBottom.fixture:setUserData("borderBottom")
 
     return gen
+end
+
+function generator.reset(gen)
+    gen.column = 0
+    gen.offset = 0
+
+    gen.cols = {}
+    gen.skips = {}
+    gen.skipRuns = {}
+    
+    gen.extras = {}
+    local extraPhysicsIndex = 1
+    while gen.extraPhysics[extraPhysicsIndex] do
+        local ep = gen.extraPhysics[extraPhysicsIndex]
+
+        ep.upperBody:destroy()
+        ep.lowerBody:destroy()
+
+        extraPhysicsIndex = extraPhysicsIndex + 1
+    end
+    gen.extraPhysics = {}
+    gen.lastExtra = 15
+
+    gen.lastPowerup = 20
+
+    gen.borderRight.body:setX(gen.width - 10)
+    gen.borderTop.body:setX(gen.width/2)
+    gen.borderBottom.body:setX(gen.width/2)
+
+    local powerupIndex = 1
+    while powersSpawned[powerupIndex] do
+        local expower = powersSpawned[powerupIndex]
+
+        expower.body:destroy()
+
+        powerupIndex = powerupIndex + 1
+    end
+    powersSpawned = {}
 end
 
 function generator.genColumn(gen)
@@ -213,19 +258,22 @@ function generator.makeCliff(gen, x, cw)
     local upperHeight = bridgeY * sprite_size
     local lowerHeight = gen.height - upperHeight - sprite_size
     local bodyX = x * sprite_size + (width / 2)
+    
     extraPhysic.upperBody = love.physics.newBody(world, bodyX, (upperHeight - (sprite_size / 2)) / 2)
     extraPhysic.upperShape = love.physics.newRectangleShape(width, upperHeight - (sprite_size / 2))
     extraPhysic.upperFixture = love.physics.newFixture(extraPhysic.upperBody, extraPhysic.upperShape)
+    extraPhysic.upperFixture:setUserData("upperFixture")
+
     extraPhysic.lowerBody = love.physics.newBody(world, bodyX, upperHeight + sprite_size + (lowerHeight / 2))
     extraPhysic.lowerShape = love.physics.newRectangleShape(width, lowerHeight)
     extraPhysic.lowerFixture = love.physics.newFixture(extraPhysic.lowerBody, extraPhysic.lowerShape)
+    extraPhysic.lowerFixture:setUserData("lowerFixture")
 
     table.insert(gen.extraPhysics, extraPhysic)
 end
 
 function generator.draw(gen)
     love.graphics.push()
-    love.graphics.origin()
     love.graphics.translate(gen.offset * -1, 0)
     gen.spriteBatch:clear()
     gen.extraBatch:clear()

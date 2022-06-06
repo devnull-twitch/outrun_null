@@ -9,10 +9,13 @@ paused = false
 started = false
 debug = false
 
+baseWidth = 650
+baseHeight = 650
+
 coins = 0
 
 function love.load()
-    love.window.setMode(650, 650)
+    love.window.setMode(baseWidth, baseHeight)
 
     love.graphics.setFont(defaultFont)
     menu.load()
@@ -23,7 +26,7 @@ function love.load()
     gen = generator.new()
     generator.genColumn(gen)
 
-    player = Character:new(300, 650/2)
+    player = Character:new(300, baseHeight/2)
     player:init()
 end
 
@@ -35,6 +38,13 @@ function love.draw()
 
     -- clear screen
     love.graphics.clear(0.10, 0.15, 0.2)
+
+    -- handle scaling
+    if options.toggleScale then
+        love.graphics.scale(1.5, 1.5)
+    else
+        love.graphics.scale(1, 1)
+    end
 
     -- draw ground
     love.graphics.setColor(1.0, 1.0, 1.0)
@@ -60,9 +70,43 @@ function love.draw()
        love.graphics.setColor(0.9, 0.9, 1)
        love.graphics.print("Game [P]aused", width / 2 - 80, height / 2 - 30)
     end
+
+    if player.dead then
+        local fade = math.min(1, deadFade)
+        local width, height, flags = love.window.getMode()
+        local headlineText = "You are dead"
+        local textWidth = headlineFont:getWidth(headlineText)
+
+        local boxW = textWidth + 20
+        local boxH = headlineFont:getHeight() + (defaultFont:getHeight() * 2) + 40
+        local boxX = width / 2 - (boxW / 2)
+        local boxY = height / 2 - (boxH / 2)
+
+        love.graphics.setColor(0, 0, 0, fade)
+        love.graphics.rectangle(
+            "fill",
+            boxX, boxY,
+            boxW, boxH
+        )
+
+        local headlineX = (width / 2) - ((textWidth - 5) / 2)
+        local headlineY = (height / 2) - (boxH / 2) + 10
+
+        love.graphics.setColor(0.9, 0.9, 1, fade)
+        love.graphics.setFont(headlineFont)
+        love.graphics.print(headlineText, headlineX, headlineY)
+        love.graphics.setFont(defaultFont)
+
+        local option1Y = headlineY + headlineFont:getHeight() + 10
+        love.graphics.print("[R]estart", headlineX, option1Y)
+
+        local option2Y = option1Y + defaultFont:getHeight() + 10
+        love.graphics.print("[Q]uit to menu", headlineX, option2Y)
+    end
 end
 
 playerPhase = 0
+deadFade = 0
 function love.update(dt)
     if not started then
         menu.update(dt)
@@ -70,6 +114,7 @@ function love.update(dt)
     end
 
     if player.dead then
+        deadFade = deadFade + dt
         return
     end
 
@@ -116,7 +161,21 @@ function love.keypressed(key, scancode, isrepeat)
         return
     end
 
-    if key == "p" and not isrepeat then
+    if player.dead and key == "r" and not isrepeat then
+        player:reset(300, baseHeight/2)
+        generator.reset(gen)
+        autoscroll.reset()
+    end
+
+    if player.dead and key == "q" and not isrepeat then
+        player:reset(300, baseHeight/2)
+        generator.reset(gen)
+        autoscroll.reset()
+
+        started = false
+    end
+
+    if key == "p" and not isrepeat and not player.dead then
         paused = not paused
     end
 
@@ -128,9 +187,15 @@ end
 function beginContact(a, b, coll)
     if a:getUserData() == "powerup" then
         powerups.collision(a)
+        return
     end
     if b:getUserData() == "powerup" then
         powerups.collision(b)
+        return
+    end
+
+    if debug then
+        print(a:getUserData(), b:getUserData())
     end
 end
 

@@ -1,8 +1,11 @@
 animationSpeed = 20
 menu = {}
+options = {
+    toggleScale = false
+}
 
-defaultFont = love.graphics.newFont("assets/JetBrainsMono-Medium.ttf", 15)
-headlineFont = love.graphics.newFont("assets/JetBrainsMono-Medium.ttf", 25)
+defaultFont = love.graphics.newFont("assets/jetbrainsmono-medium.ttf", 15)
+headlineFont = love.graphics.newFont("assets/jetbrainsmono-medium.ttf", 25)
 
 function playHandler()
     started = true
@@ -12,13 +15,38 @@ function quitHandler()
     love.event.quit()
 end
 
+function settingStartHandler()
+    menu.options = { 
+        { label = "1.5x scale", active = true, handler = toggleScaleHandler, toggleFieldNAme = "toggleScale" },
+        { label = "Back to menu", active = false, handler = settingEndHandler }
+    }
+end
+
+function toggleScaleHandler()
+    options.toggleScale = not options.toggleScale
+    if options.toggleScale then
+        love.window.setMode(baseWidth * 1.5, baseHeight * 1.5)
+    else
+        love.window.setMode(baseWidth, baseHeight)
+    end
+end
+
+function settingEndHandler()
+    menu.options = { 
+        { label = "Play", active = true, handler = playHandler },
+        { label = "Settings", active = false, handler = settingStartHandler },
+        { label = "Quit", active = false, handler = quitHandler }
+    }
+end
+
 function menu.load()
     background = {}
-    background.tileImage = love.graphics.newImage("assets/GrassPers.png")
+    background.tileImage = love.graphics.newImage("assets/grass_pers.png")
     background.tileATime = 0
 
     menu.options = { 
         { label = "Play", active = true, handler = playHandler },
+        { label = "Settings", active = false, handler = settingStartHandler },
         { label = "Quit", active = false, handler = quitHandler }
     }
 end
@@ -51,6 +79,20 @@ function menu.draw()
             prefix = "> "
         end
         love.graphics.print(prefix .. opt.label, width / 2 - 125, 170 + (optionIndex * 25))
+
+        if not (opt.toggleFieldNAme == null) then
+            local toggleX = width / 2 + 50
+            love.graphics.setColor(0.4, 0.4, 0.4)
+            love.graphics.rectangle("fill", toggleX, 170 + (optionIndex * 25), 40, 20)
+            
+            if options[opt.toggleFieldNAme] then
+                love.graphics.setColor(1, 1, 1)
+                love.graphics.rectangle("fill", toggleX + 25, 170 + (optionIndex * 25) + 3, 15, 14)
+            else
+                love.graphics.setColor(0.2, 0.2, 0.2)
+                love.graphics.rectangle("fill", toggleX, 170 + (optionIndex * 25) + 3, 15, 14)
+            end
+        end
 
         optionIndex = optionIndex + 1
     end
