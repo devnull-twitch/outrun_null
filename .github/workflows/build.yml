@@ -38,7 +38,7 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "windows-version.zip,OutrunDevNull.AppImage"
+          artifacts: "OutrunDevNull.love,windows-version.zip,OutrunDevNull.AppImage"
           omitBody: true
-          tag: "v1.0.1"
+          tag: "v1.0.2"
           token: ${{ secrets.GHCR_TOKEN }}

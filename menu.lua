@@ -4,8 +4,8 @@ options = {
     toggleScale = false
 }
 
-defaultFont = love.graphics.newFont("assets/jetbrainsmono-medium.ttf", 15)
-headlineFont = love.graphics.newFont("assets/jetbrainsmono-medium.ttf", 25)
+defaultFont = love.graphics.newFont("assets/jetbrainsmono_medium.ttf", 15)
+headlineFont = love.graphics.newFont("assets/jetbrainsmono_medium.ttf", 25)
 
 function playHandler()
     started = true
