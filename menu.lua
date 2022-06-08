@@ -1,5 +1,7 @@
 animationSpeed = 20
-menu = {}
+menu = {
+    showHowToPlay = true
+}
 options = {
     toggleScale = false
 }
@@ -16,6 +18,7 @@ function quitHandler()
 end
 
 function settingStartHandler()
+    menu.showHowToPlay = false
     menu.options = { 
         { label = "1.5x scale", active = true, handler = toggleScaleHandler, toggleFieldNAme = "toggleScale" },
         { label = "Back to menu", active = false, handler = settingEndHandler }
@@ -32,6 +35,7 @@ function toggleScaleHandler()
 end
 
 function settingEndHandler()
+    menu.showHowToPlay = true
     menu.options = { 
         { label = "Play", active = true, handler = playHandler },
         { label = "Settings", active = false, handler = settingStartHandler },
@@ -61,7 +65,7 @@ function menu.draw()
     love.graphics.rectangle(
         "fill",
         width / 2 - 150, 125,
-        300, 250
+        300, 300
     )
     love.graphics.setColor(0.9, 0.9, 1)
     love.graphics.setFont(headlineFont)
@@ -95,6 +99,18 @@ function menu.draw()
         end
 
         optionIndex = optionIndex + 1
+    end
+
+    if menu.showHowToPlay then
+        love.graphics.draw(powerupSprite, powers[1].quad, width / 2 - 125, 310)
+        love.graphics.print("Battery makes you go fast!", width / 2 - 100, 310)
+
+        love.graphics.draw(powerupSprite, powers[2].quad, width / 2 - 125, 340)
+        love.graphics.print("Do you like money?", width / 2 - 100, 340)
+        
+        love.graphics.draw(powerupSprite, powers[3].quad, width / 2 - 125, 370)
+        love.graphics.print("Get a jump [space] for each", width / 2 - 100, 370)
+        love.graphics.print("Helpful to jump over cliffs", width / 2 - 100, 390)
     end
 end
 
