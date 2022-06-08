@@ -40,5 +40,5 @@ jobs:
         with:
           artifacts: "OutrunDevNull.love,windows-version.zip,OutrunDevNull.AppImage"
           omitBody: true
-          tag: "v1.0.3"
+          tag: "v1.1.0"
           token: ${{ secrets.GHCR_TOKEN }}
